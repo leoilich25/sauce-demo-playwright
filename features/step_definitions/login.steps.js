@@ -1,18 +1,38 @@
 
 const { Given, When, Then } = require('@cucumber/cucumber');
+const { LoginPage } = require('../../pages/LoginPage');
 
 Given('que el usuario navega a la página de login de Sauce Demo', async function () {
-  await this.page.goto('https://www.saucedemo.com/');
+  this.loginPage = new LoginPage(this.page);
+  await this.loginPage.navigate();
 });
 
 When('el usuario inicia sesión con credenciales válidas de {string}', async function (userType) {
-  // lo implementaremos en el siguiente paso
+  const users = {
+    standard_user: {
+      username: 'standard_user',
+      password: 'secret_sauce'
+    },
+    locked_out_user: {
+      username: 'locked_out_user',
+      password: 'secret_sauce'
+    }
+  };
+
+  const user = users[userType];
+  await this.loginPage.login(user.username, user.password);
 });
 
 Then('el usuario debería ver la página de productos', async function () {
-  // lo implementaremos en el siguiente paso
+  const isVisible = await this.loginPage.isProductsPageVisible();
+  if (!isVisible) {
+    throw new Error('La página de productos no es visible');
+  }
 });
 
 Then('el sistema debería mostrar un mensaje de error', async function () {
-  // lo implementaremos en el siguiente paso
+  const isVisible = await this.loginPage.isErrorMessageVisible();
+  if (!isVisible) {
+    throw new Error('El mensaje de error no se mostró');
+  }
 });
