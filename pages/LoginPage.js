@@ -1,3 +1,4 @@
+
 class LoginPage {
   constructor(page) {
     this.page = page;
@@ -5,20 +6,33 @@ class LoginPage {
     this.passwordInput = '#password';
     this.loginButton = '#login-button';
     this.errorMessage = '[data-test="error"]';
+    this.productsContainer = '.inventory_list';
   }
 
-  async navigate() {
-    await this.page.goto('https://www.saucedemo.com/');
-  }
+  
+ async navigate() {
+  await this.page.goto('https://www.saucedemo.com/', {
+    waitUntil: 'domcontentloaded'
+  });
+}
 
-  async login(username, password) {
+
+  async submitLogin(username, password) {
     await this.page.fill(this.usernameInput, username);
     await this.page.fill(this.passwordInput, password);
     await this.page.click(this.loginButton);
   }
 
+  async waitForSuccessfulLogin() {
+    await this.page.waitForSelector(this.productsContainer, { timeout: 10000 });
+  }
+
+  async waitForLoginError() {
+    await this.page.waitForSelector(this.errorMessage, { timeout: 10000 });
+  }
+
   async isProductsPageVisible() {
-    return await this.page.locator('.inventory_list').isVisible();
+    return await this.page.locator(this.productsContainer).isVisible();
   }
 
   async isErrorMessageVisible() {

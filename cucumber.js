@@ -9,6 +9,7 @@ module.exports = {
       "progress",
       "html:reports/cucumber-report.html"
     ],
-    publishQuiet: true
+    publishQuiet: true,
+    timeout: 30000 // ✅ 30 segundos por step
   }
 };

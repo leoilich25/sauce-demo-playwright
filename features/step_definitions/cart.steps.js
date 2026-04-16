@@ -1,3 +1,4 @@
+
 const { Given, When, Then } = require('@cucumber/cucumber');
 const { LoginPage } = require('../../pages/LoginPage');
 const { ProductsPage } = require('../../pages/ProductsPage');
@@ -12,10 +13,13 @@ Given('que el usuario ha iniciado sesión como {string}', async function (userTy
 
   this.loginPage = new LoginPage(this.page);
   await this.loginPage.navigate();
-  await this.loginPage.login(
+
+  await this.loginPage.submitLogin(
     users[userType].username,
     users[userType].password
   );
+
+  await this.loginPage.waitForSuccessfulLogin();
 
   this.productsPage = new ProductsPage(this.page);
 });

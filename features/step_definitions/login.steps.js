@@ -7,6 +7,7 @@ Given('que el usuario navega a la página de login de Sauce Demo', async functio
   await this.loginPage.navigate();
 });
 
+
 When('el usuario inicia sesión con credenciales válidas de {string}', async function (userType) {
   const users = {
     standard_user: {
@@ -20,8 +21,17 @@ When('el usuario inicia sesión con credenciales válidas de {string}', async fu
   };
 
   const user = users[userType];
-  await this.loginPage.login(user.username, user.password);
+  await this.loginPage.submitLogin(user.username, user.password);
+
+  if (userType === 'standard_user') {
+    await this.loginPage.waitForSuccessfulLogin();
+  }
+
+  if (userType === 'locked_out_user') {
+    await this.loginPage.waitForLoginError();
+  }
 });
+
 
 Then('el usuario debería ver la página de productos', async function () {
   const isVisible = await this.loginPage.isProductsPageVisible();
