@@ -1,36 +1,26 @@
 
-const { Given, When, Then } = require('@cucumber/cucumber');
-const { LoginPage } = require('../../pages/LoginPage');
-const { ProductsPage } = require('../../pages/ProductsPage');
+const { createBdd } = require('playwright-bdd');
+const { test } = require('../support/fixtures');
 
-Given('que el usuario ha iniciado sesión como {string}', async function (userType) {
+const { Given, When, Then } = createBdd(test);
+
+Given('que el usuario ha iniciado sesión como {string}', async ({ loginPage }, userType) => {
   const users = {
-    standard_user: {
-      username: 'standard_user',
-      password: 'secret_sauce'
-    }
+    standard_user: { username: 'standard_user', password: 'secret_sauce' },
   };
 
-  this.loginPage = new LoginPage(this.page);
-  await this.loginPage.navigate();
-
-  await this.loginPage.submitLogin(
-    users[userType].username,
-    users[userType].password
-  );
-
-  await this.loginPage.waitForSuccessfulLogin();
-
-  this.productsPage = new ProductsPage(this.page);
+  await loginPage.navigate();
+  await loginPage.submitLogin(users[userType].username, users[userType].password);
+  await loginPage.waitForSuccessfulLogin();
 });
 
-When('el usuario agrega un producto al carrito', async function () {
-  await this.productsPage.addProductToCart();
-  await this.productsPage.goToCart();
+When('el usuario agrega un producto al carrito', async ({ productsPage }) => {
+  await productsPage.addProductToCart();
+  await productsPage.goToCart();
 });
 
-Then('el producto debería mostrarse en el carrito de compras', async function () {
-  const isVisible = await this.productsPage.isProductInCart();
+Then('el producto debería mostrarse en el carrito de compras', async ({ productsPage }) => {
+  const isVisible = await productsPage.isProductInCart();
   if (!isVisible) {
     throw new Error('El producto no se encuentra en el carrito');
   }

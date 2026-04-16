@@ -1,15 +1,3 @@
 
-const { Before, After } = require('@cucumber/cucumber');
-const { chromium } = require('playwright');
-
-Before(async function () {
-  this.browser = await chromium.launch({ headless: false });
-  this.context = await this.browser.newContext();
-  this.page = await this.context.newPage();
-});
-
-After(async function () {
-  await this.page.close();
-  await this.context.close();
-  await this.browser.close();
-});
+// El ciclo de vida del browser es gestionado automáticamente por Playwright.
+// Agrega hooks personalizados aquí si los necesitas usando createBdd(test).
