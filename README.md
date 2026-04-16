@@ -97,7 +97,7 @@ sauce-demo-playwright/
 ### 1️⃣ Clonar el repositorio
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/leoilich25/sauce-demo-playwright.git
 cd sauce-demo-playwright
 ```
 
