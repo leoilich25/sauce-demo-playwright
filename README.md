@@ -5,7 +5,7 @@
 Este proyecto contiene una suite de pruebas automatizadas para la aplicación web **Sauce Demo**  
 (https://www.saucedemo.com/), desarrollada como parte de un reto técnico de automatización QA.
 
-La solución utiliza **Playwright** junto con **Cucumber (BDD)**, aplicando el **Patrón de Diseño Page Object Model (POM)** para asegurar un código mantenible, legible y escalable.
+La solución integra **Playwright** con **Cucumber (BDD)** mediante **playwright-bdd**, aplicando el **Patrón de Diseño Page Object Model (POM)** para asegurar un código mantenible, legible y escalable. Cada paso de cada escenario genera una captura de pantalla embebida en el reporte HTML de Playwright.
 
 ---
 
@@ -15,6 +15,7 @@ La suite cubre el flujo principal de compra de un usuario:
 
 - ✅ Login exitoso con usuario estándar
 - ❌ Login fallido con usuario bloqueado
+- ✅ Login con múltiples combinaciones de credenciales (Scenario Outline)
 - ✅ Agregar producto al carrito
 - ✅ Visualizar productos en el carrito
 - ✅ Completar el proceso de checkout
@@ -28,9 +29,10 @@ La suite cubre el flujo principal de compra de un usuario:
 |---|---|
 | Node.js | >= 18 |
 | Playwright | ^1.59.1 |
-| @cucumber/cucumber | ^12.8.1 |
 | @playwright/test | ^1.59.1 |
-| JavaScript | ES2020+ |
+| playwright-bdd | ^8.5.0 |
+| @cucumber/cucumber | ^12.8.1 |
+| JavaScript | CommonJS (Node.js) |
 
 ---
 
@@ -38,26 +40,27 @@ La suite cubre el flujo principal de compra de un usuario:
 
 ```
 sauce-demo-playwright/
-├── cucumber.js                  # Configuración de Cucumber
-├── playwright.config.js         # Configuración de Playwright
+├── cucumber.js                    # Configuración legacy de Cucumber CLI
+├── playwright.config.js           # Configuración de Playwright + playwright-bdd
 ├── package.json
 ├── features/
-│   ├── login.feature            # Escenarios de inicio de sesión
-│   ├── cart.feature             # Escenarios del carrito de compras
-│   ├── checkout.feature         # Escenarios del proceso de compra
+│   ├── login.feature              # Escenarios de inicio de sesión
+│   ├── cart.feature               # Escenarios del carrito de compras
+│   ├── checkout.feature           # Escenarios del proceso de compra
 │   ├── step_definitions/
 │   │   ├── login.steps.js
 │   │   ├── cart.steps.js
 │   │   └── checkout.steps.js
 │   └── support/
-│       └── hooks.js             # Configuración del ciclo de vida (Before/After)
+│       ├── fixtures.js            # Fixtures de Playwright (Page Objects)
+│       └── hooks.js               # AfterStep: captura de pantalla por paso
 ├── pages/
 │   ├── LoginPage.js
 │   ├── ProductsPage.js
 │   ├── CartPage.js
 │   └── CheckoutPage.js
-└── reports/
-    └── cucumber-report.html     # Reporte HTML generado tras cada ejecución
+├── .features-gen/                 # Tests generados por bddgen (no editar)
+└── playwright-report/             # Reporte HTML con capturas de pantalla
 ```
 
 ### 📂 Descripción de carpetas
@@ -65,30 +68,56 @@ sauce-demo-playwright/
 | Carpeta | Descripción |
 |---|---|
 | `features/` | Escenarios escritos en Gherkin |
-| `features/step_definitions/` | Implementación de los steps |
-| `features/support/` | Hooks y configuración del ciclo de vida |
+| `features/step_definitions/` | Implementación de los steps con playwright-bdd |
+| `features/support/` | Fixtures (page objects) y hooks de ciclo de vida |
 | `pages/` | Page Objects (POM) |
-| `reports/` | Reporte HTML de ejecución |
+| `.features-gen/` | Archivos de test generados por `bddgen` (no editar) |
+| `playwright-report/` | Reporte HTML interactivo con capturas de pantalla |
 
 ---
 
 ## 🗂️ Escenarios de Prueba
 
 ### Login (`login.feature`)
-| Tag | Escenario |
-|---|---|
-| `@happy_path` | Login exitoso con `standard_user` |
-| `@error` | Login fallido con usuario bloqueado (`locked_out_user`) |
+
+| Tag | Tipo | Escenario |
+|---|---|---|
+| `@login_happy_path` | Scenario | Login exitoso con `standard_user` |
+| `@login_error` | Scenario | Login fallido con `locked_out_user` (usuario bloqueado) |
+| `@login_multiple` | Scenario Outline | Login con múltiples combinaciones de credenciales (5 casos) |
+
+**Scenario Outline – Examples:**
+
+| usuario | contraseña | resultado esperado |
+|---|---|---|
+| `standard_user` | `secret_sauce` | ✅ exitoso |
+| `locked_out_user` | `secret_sauce` | ❌ error |
+| `problem_user` | `secret_sauce` | ✅ exitoso |
+| `performance_glitch_user` | `secret_sauce` | ✅ exitoso |
+| `standard_user` | `contrasena_incorrecta` | ❌ error |
 
 ### Carrito (`cart.feature`)
+
 | Tag | Escenario |
 |---|---|
 | `@cart` | Agregar un producto al carrito y verificar que aparece |
 
 ### Checkout (`checkout.feature`)
+
 | Tag | Escenario |
 |---|---|
 | `@checkout` | Completar el proceso de compra y verificar confirmación |
+
+---
+
+## 🔐 Credenciales de Prueba
+
+| Usuario | Contraseña | Comportamiento |
+|---|---|---|
+| `standard_user` | `secret_sauce` | Login exitoso |
+| `locked_out_user` | `secret_sauce` | Error – usuario bloqueado |
+| `problem_user` | `secret_sauce` | Login exitoso (interfaz con bugs visuales) |
+| `performance_glitch_user` | `secret_sauce` | Login exitoso (con demora simulada) |
 
 ---
 
@@ -117,79 +146,56 @@ npx playwright install
 
 ## ▶️ Ejecución de Pruebas
 
-### Ejecutar toda la suite con Cucumber
+| Comando | Descripción |
+|---|---|
+| `npm run test:bdd` | Genera los tests y ejecuta toda la suite con Playwright |
+| `npm run test:bdd:tag "@login_happy_path"` | Ejecuta solo los escenarios con el tag indicado |
+| `npm run bdd:gen` | Solo genera los archivos de test (sin ejecutar) |
+| `npx playwright show-report` | Abre el reporte HTML interactivo |
+
+### Ejemplos de ejecución por tag
 
 ```bash
-npm test
-```
-
-### Ejecutar por tag específico
-
-```bash
-npx cucumber-js --tags @login
-npx cucumber-js --tags @cart
-npx cucumber-js --tags @checkout
-npx cucumber-js --tags @happy_path
-npx cucumber-js --tags @error
-```
-
-### Ejecutar Playwright puro (opcional)
-
-```bash
-npm run test:playwright
-```
-
-### Ejecutar en modo headless
-
-Por defecto los tests corren con el navegador visible. Para ejecutarlos sin interfaz gráfica, modifica `features/support/hooks.js`:
-
-```js
-this.browser = await chromium.launch({ headless: true });
+npm run test:bdd:tag "@login_multiple"
+npm run test:bdd:tag "@cart"
+npm run test:bdd:tag "@checkout"
 ```
 
 ---
 
-## 📊 Reportes
+## 📊 Capturas de Pantalla y Reporte
 
-Tras cada ejecución se genera automáticamente un reporte HTML en:
+El proyecto genera capturas de pantalla automáticas de dos formas:
 
+1. **Por paso (AfterStep):** Al finalizar cada paso Gherkin se toma una captura y se adjunta al reporte como attachment.
+2. **Por test (Playwright):** `screenshot: 'on'` en `playwright.config.js` captura el estado final de cada test.
+
+Para abrir el reporte interactivo con todas las capturas:
+
+```bash
+npx playwright show-report
 ```
-reports/cucumber-report.html
-```
-
-Ábrelo en cualquier navegador para ver el detalle de cada escenario, pasos ejecutados y resultados.
-
----
-
-## 🔐 Credenciales de Prueba
-
-| Tipo de Usuario | Usuario | Contraseña | Comportamiento esperado |
-|---|---|---|---|
-| Usuario estándar | `standard_user` | `secret_sauce` | Login exitoso |
-| Usuario bloqueado | `locked_out_user` | `secret_sauce` | Error de usuario bloqueado |
 
 ---
 
 ## 🧠 Estrategia de Automatización
 
-- Uso de BDD para alinear pruebas con reglas de negocio.
-- Page Object Model para encapsular lógica y selectores.
-- Steps orientados a comportamiento, no a implementación.
-- Manejo explícito de flujos positivos y negativos.
-- Esperas basadas en estado de la aplicación (no en `sleep`).
-- Timeout por step configurado en 30 segundos en `cucumber.js` para evitar falsos fallos.
-
-Ver archivo **STRATEGY.md** para más detalles.
+- **BDD con Gherkin:** escenarios legibles para perfiles técnicos y no técnicos.
+- **playwright-bdd:** integración nativa entre Cucumber y el runner de Playwright, aprovechando fixtures, reporters y trazas.
+- **Page Object Model:** lógica de UI encapsulada en `pages/`, desacoplada de los steps.
+- **Scenario Outline + Examples:** robustez mediante parametrización de casos de prueba con distintos usuarios y contraseñas.
+- **Capturas por paso:** trazabilidad visual completa de cada escenario en el reporte.
+- **Esperas basadas en estado del DOM:** sin `sleep`, usando `waitForSelector` para mayor estabilidad.
 
 ---
 
 ## ✅ Buenas Prácticas Aplicadas
 
 - Código modular y reutilizable mediante Page Object Model
-- Separación clara de responsabilidades (features / steps / pages)
+- Separación clara de responsabilidades (features / steps / pages / support)
 - Sincronización estable basada en estado del DOM
-- Hooks centralizados para gestión del ciclo de vida del navegador
-- Commits pequeños y descriptivos
+- Fixtures de Playwright para inyección de dependencias en steps
+- Capturas de pantalla automáticas por paso para trazabilidad
 
 ---
 
@@ -197,3 +203,4 @@ Ver archivo **STRATEGY.md** para más detalles.
 
 **Emilio Leonardo Ilich Saavedra Jiménez**  
 QA Automation Engineer
+

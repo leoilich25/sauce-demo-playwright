@@ -20,6 +20,7 @@ module.exports = defineConfig({
   use: {
     trace: 'on-first-retry',
     headless: false,
+    screenshot: 'on',
   },
   projects: [
     {

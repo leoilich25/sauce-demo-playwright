@@ -39,3 +39,20 @@ Then('el sistema debería mostrar un mensaje de error', async ({ loginPage }) =>
     throw new Error('El mensaje de error no se mostró');
   }
 });
+
+When('el usuario intenta iniciar sesión con {string} y {string}', async ({ loginPage }, usuario, contrasena) => {
+  await loginPage.submitLogin(usuario, contrasena);
+});
+
+Then('el resultado del login debería ser {string}', async ({ loginPage }, resultado) => {
+  if (resultado === 'exitoso') {
+    await loginPage.waitForSuccessfulLogin();
+    const isVisible = await loginPage.isProductsPageVisible();
+    if (!isVisible) throw new Error('La página de productos no es visible');
+  } else if (resultado === 'error') {
+    await loginPage.waitForLoginError();
+    const isVisible = await loginPage.isErrorMessageVisible();
+    if (!isVisible) throw new Error('El mensaje de error no se mostró');
+  }
+});
+

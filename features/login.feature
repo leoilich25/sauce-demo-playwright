@@ -17,3 +17,16 @@ Feature: Login en Sauce Demo
   Scenario: Login fallido con usuario bloqueado
     When el usuario inicia sesión con credenciales válidas de "locked_out_user"
     Then el sistema debería mostrar un mensaje de error
+
+  @login_multiple
+  Scenario Outline: Login con múltiples combinaciones de credenciales
+    When el usuario intenta iniciar sesión con "<usuario>" y "<contrasena>"
+    Then el resultado del login debería ser "<resultado>"
+
+    Examples:
+      | usuario                 | contrasena          | resultado |
+      | standard_user           | secret_sauce        | exitoso   |
+      | locked_out_user         | secret_sauce        | error     |
+      | problem_user            | secret_sauce        | exitoso   |
+      | performance_glitch_user | secret_sauce        | exitoso   |
+      | standard_user           | contrasena_incorrecta | error   |
