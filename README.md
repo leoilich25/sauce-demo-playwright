@@ -40,37 +40,47 @@ La suite cubre el flujo principal de compra de un usuario:
 
 ```
 sauce-demo-playwright/
-├── cucumber.js                    # Configuración legacy de Cucumber CLI
-├── playwright.config.js           # Configuración de Playwright + playwright-bdd
+├── cucumber.js                          # Configuración legacy de Cucumber CLI
+├── playwright.config.js                 # Configuración de Playwright + playwright-bdd
 ├── package.json
-├── features/
-│   ├── login.feature              # Escenarios de inicio de sesión
-│   ├── cart.feature               # Escenarios del carrito de compras
-│   ├── checkout.feature           # Escenarios del proceso de compra
-│   ├── step_definitions/
-│   │   ├── login.steps.js
-│   │   ├── cart.steps.js
-│   │   └── checkout.steps.js
-│   └── support/
-│       ├── fixtures.js            # Fixtures de Playwright (Page Objects)
-│       └── hooks.js               # AfterStep: captura de pantalla por paso
-├── pages/
-│   ├── LoginPage.js
-│   ├── ProductsPage.js
-│   ├── CartPage.js
-│   └── CheckoutPage.js
-├── .features-gen/                 # Tests generados por bddgen (no editar)
-└── playwright-report/             # Reporte HTML con capturas de pantalla
+├── src/
+│   ├── locators/                        # Selectores CSS desacoplados
+│   │   ├── LoginLocators.js
+│   │   ├── ProductsLocators.js
+│   │   ├── CartLocators.js
+│   │   └── CheckoutLocators.js
+│   └── pages/                           # Acciones sobre la UI (POM)
+│       ├── LoginPage.js
+│       ├── ProductsPage.js
+│       ├── CartPage.js
+│       └── CheckoutPage.js
+├── test/
+│   ├── resources/
+│   │   └── features/                    # Escenarios de prueba (Gherkin)
+│   │       ├── login.feature
+│   │       ├── cart.feature
+│   │       └── checkout.feature
+│   └── e2e/
+│       ├── step_definitions/            # Conexión entre Gherkin y Playwright
+│       │   ├── login.steps.js
+│       │   ├── cart.steps.js
+│       │   └── checkout.steps.js
+│       └── support/
+│           ├── fixtures.js              # Fixtures de Playwright (inyección de páginas)
+│           └── hooks.js                 # AfterStep: captura de pantalla por paso
+├── .features-gen/                       # Tests generados por bddgen (no editar)
+└── playwright-report/                   # Reporte HTML con capturas de pantalla
 ```
 
 ### 📂 Descripción de carpetas
 
 | Carpeta | Descripción |
 |---|---|
-| `features/` | Escenarios escritos en Gherkin |
-| `features/step_definitions/` | Implementación de los steps con playwright-bdd |
-| `features/support/` | Fixtures (page objects) y hooks de ciclo de vida |
-| `pages/` | Page Objects (POM) |
+| `src/locators/` | Selectores CSS de cada página, separados de la lógica |
+| `src/pages/` | Acciones sobre la UI usando los locators (POM) |
+| `test/resources/features/` | Escenarios escritos en Gherkin |
+| `test/e2e/step_definitions/` | Conexión entre los pasos Gherkin y Playwright |
+| `test/e2e/support/` | Fixtures y hooks de ciclo de vida |
 | `.features-gen/` | Archivos de test generados por `bddgen` (no editar) |
 | `playwright-report/` | Reporte HTML interactivo con capturas de pantalla |
 

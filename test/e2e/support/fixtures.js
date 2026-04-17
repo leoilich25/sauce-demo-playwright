@@ -1,8 +1,8 @@
 const { test: base } = require('playwright-bdd');
-const { LoginPage } = require('../../pages/LoginPage');
-const { ProductsPage } = require('../../pages/ProductsPage');
-const { CartPage } = require('../../pages/CartPage');
-const { CheckoutPage } = require('../../pages/CheckoutPage');
+const { LoginPage } = require('../../../src/pages/LoginPage');
+const { ProductsPage } = require('../../../src/pages/ProductsPage');
+const { CartPage } = require('../../../src/pages/CartPage');
+const { CheckoutPage } = require('../../../src/pages/CheckoutPage');
 
 const test = base.extend({
   loginPage: async ({ page }, use) => {

@@ -1,12 +1,12 @@
+const { CartLocators } = require('../locators/CartLocators');
 
 class CartPage {
   constructor(page) {
     this.page = page;
-    this.checkoutButton = '[data-test="checkout"]';
   }
 
   async proceedToCheckout() {
-    await this.page.click(this.checkoutButton);
+    await this.page.click(CartLocators.checkoutButton);
   }
 }
 

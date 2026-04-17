@@ -1,5 +1,5 @@
-// Generated from: features\cart.feature
-import { test } from "../../features/support/fixtures.js";
+// Generated from: test\resources\features\cart.feature
+import { test } from "../../../../test/e2e/support/fixtures.js";
 
 test.describe('Gestión del carrito de compras', () => {
 
@@ -18,7 +18,7 @@ test.describe('Gestión del carrito de compras', () => {
 
 test.use({
   $test: [({}, use) => use(test), { scope: 'test', box: true }],
-  $uri: [({}, use) => use('features\\cart.feature'), { scope: 'test', box: true }],
+  $uri: [({}, use) => use('test\\resources\\features\\cart.feature'), { scope: 'test', box: true }],
   $bddFileData: [({}, use) => use(bddFileData), { scope: "test", box: true }],
 });
 

@@ -2,8 +2,8 @@
 module.exports = {
   default: {
     require: [
-      "features/step_definitions/**/*.js",
-      "features/support/**/*.js"
+      "test/e2e/step_definitions/**/*.js",
+      "test/e2e/support/**/*.js"
     ],
     format: [
       "progress",

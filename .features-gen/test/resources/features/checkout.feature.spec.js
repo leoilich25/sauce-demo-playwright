@@ -1,5 +1,5 @@
-// Generated from: features\checkout.feature
-import { test } from "../../features/support/fixtures.js";
+// Generated from: test\resources\features\checkout.feature
+import { test } from "../../../../test/e2e/support/fixtures.js";
 
 test.describe('Proceso de compra', () => {
 
@@ -19,7 +19,7 @@ test.describe('Proceso de compra', () => {
 
 test.use({
   $test: [({}, use) => use(test), { scope: 'test', box: true }],
-  $uri: [({}, use) => use('features\\checkout.feature'), { scope: 'test', box: true }],
+  $uri: [({}, use) => use('test\\resources\\features\\checkout.feature'), { scope: 'test', box: true }],
   $bddFileData: [({}, use) => use(bddFileData), { scope: "test", box: true }],
 });
 

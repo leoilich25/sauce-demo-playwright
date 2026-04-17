@@ -1,4 +1,3 @@
-
 const { createBdd } = require('playwright-bdd');
 const { test } = require('../support/fixtures');
 
@@ -55,4 +54,3 @@ Then('el resultado del login debería ser {string}', async ({ loginPage }, resul
     if (!isVisible) throw new Error('El mensaje de error no se mostró');
   }
 });
-

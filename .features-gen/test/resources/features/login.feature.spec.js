@@ -1,5 +1,5 @@
-// Generated from: features\login.feature
-import { test } from "../../features/support/fixtures.js";
+// Generated from: test\resources\features\login.feature
+import { test } from "../../../../test/e2e/support/fixtures.js";
 
 test.describe('Login en Sauce Demo', () => {
 
@@ -52,7 +52,7 @@ test.describe('Login en Sauce Demo', () => {
 
 test.use({
   $test: [({}, use) => use(test), { scope: 'test', box: true }],
-  $uri: [({}, use) => use('features\\login.feature'), { scope: 'test', box: true }],
+  $uri: [({}, use) => use('test\\resources\\features\\login.feature'), { scope: 'test', box: true }],
   $bddFileData: [({}, use) => use(bddFileData), { scope: "test", box: true }],
 });
 

@@ -3,10 +3,10 @@ const { defineConfig, devices } = require('@playwright/test');
 const { defineBddConfig } = require('playwright-bdd');
 
 const testDir = defineBddConfig({
-  features: 'features/**/*.feature',
+  features: 'test/resources/features/**/*.feature',
   steps: [
-    'features/step_definitions/**/*.js',
-    'features/support/fixtures.js',
+    'test/e2e/step_definitions/**/*.js',
+    'test/e2e/support/fixtures.js',
   ],
 });
 
